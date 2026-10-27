@@ -34,6 +34,19 @@ nav.tabs button.on{color:var(--g);font-weight:600}
 .card{background:var(--card);border-radius:var(--rad);box-shadow:var(--sh);margin:0 0 16px;overflow:hidden}
 .pad{padding:14px 16px}
 .day{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:4px 2px 8px}
+.strip{position:sticky;top:var(--hh,60px);z-index:4;background:var(--bg);display:flex;gap:4px;margin:0 -14px 10px;padding:6px 14px 8px}
+.strip button{flex:1;min-width:0;border:0;border-radius:12px;background:#fff;box-shadow:var(--sh);padding:6px 0 5px;display:flex;flex-direction:column;align-items:center;gap:1px;color:var(--ink);font-size:13px;font-weight:600;line-height:1.1}
+.strip button small{font-size:11px;font-weight:500;color:var(--mut)}
+.strip button i{font-style:normal;font-size:11px;height:13px;line-height:13px;color:var(--mut)}
+.strip button i.s-bestaetigt{color:var(--g)}.strip button i.s-ersetzt{color:var(--o)}.strip button i.s-abgelehnt{color:var(--r)}
+.strip button.today{box-shadow:inset 0 0 0 2px var(--g)}
+.strip button.cur{background:var(--g);color:#fff}.strip button.cur small,.strip button.cur i{color:#fff}
+.strip button.past:not(.cur){opacity:.6}
+.swipe{display:flex;align-items:flex-start;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;scrollbar-width:none;margin:0 -14px;touch-action:pan-x pan-y}
+.swipe::-webkit-scrollbar{display:none}
+.slide{flex:0 0 100%;width:100%;scroll-snap-align:start;scroll-snap-stop:always;padding:0 14px}
+.today-tag{font-size:11px;font-weight:700;color:var(--g);background:var(--g2);border-radius:99px;padding:2px 7px;margin-left:6px;vertical-align:1px}
+.hint{font-size:12.5px;color:var(--mut);text-align:center;margin:-4px 0 12px}
 .day b{font-size:15px}.day span{font-size:13px;color:var(--mut)}
 .pic{position:relative;aspect-ratio:16/10;background:linear-gradient(135deg,#dfe9d3,#f3e3c7);display:block;width:100%;border:0;padding:0;cursor:pointer}
 .pic img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
@@ -109,11 +122,12 @@ ol.how{padding-left:20px;margin:6px 0;font-size:14.5px}ol.how li{margin:0 0 6px}
 // ====== Cookies Wochenplaner ======
 // Diese App enthält KEINE persönlichen Daten. Plan und Auswahl liegen im PRIVATEN Repo GH_REPO
 // und werden nur mit dem GitHub-Schlüssel geladen, der ausschließlich auf diesem Gerät (localStorage) gespeichert ist.
-const APP_VER='1.0.0';
+const APP_VER='1.1.0';
 const GH_REPO='tinofavetto/cookie-wochenplaner-daten';
 const LS_GH='cwp.gh', LS_CACHE='cwp.cache', LS_CHECK='cwp.check.';
 const $=s=>document.querySelector(s);
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let CUR=null, CUR_TODAY=null;
 let PLAN=null, AUSW=null, AUSW_SHA=null, TAB='woche', LOADERR=null, OFFLINE=false;
 let SAVE={state:'idle',timer:null,busy:false,again:false,err:'',at:null};
 
@@ -217,15 +231,31 @@ function dayCard(i){
    <button class="more" type="button" data-act="detail" data-i="${i}">Rezept &amp; Zutaten ›</button>`;
   if(st.recipe!==st.original&&R(st.original))h+=`<div class="small" style="margin-top:6px">statt: ${esc(R(st.original).name)} · <button class="more" style="padding:0" type="button" data-act="reset" data-i="${i}">zurück</button></div>`;
   return h+'</div></section>'}
-function dayHead(i){const d=PLAN.days[i];return `<div class="day" id="dh${i}"><b>${esc(d.label)}</b><span>${esc(d.note||'')}</span></div>`}
+function dayHead(i){const d=PLAN.days[i];return `<div class="day" id="dh${i}"><b>${esc(d.label)}${d.date===berlinToday()?'<span class="today-tag">Heute</span>':''}</b><span>${esc(d.note||'')}</span></div>`}
+// Heute (Europe/Berlin) als YYYY-MM-DD
+function berlinToday(){try{return new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Berlin',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date())}catch(e){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}}
+function todayIdx(){const i=PLAN.days.findIndex(d=>d.date===berlinToday());return i<0?0:i}
+const WD=['So','Mo','Di','Mi','Do','Fr','Sa'],MARK={bestaetigt:'✓',ersetzt:'•',abgelehnt:'✕',offen:''};
+function stripHtml(){const t=berlinToday();return PLAN.days.map((d,i)=>{const dt=new Date(d.date+'T12:00:00Z'),st=AUSW.days[i].status;
+  return `<button type="button" data-act="jump" data-i="${i}" class="${d.date===t?'today ':''}${d.date<t?'past ':''}${i===CUR?'cur':''}" aria-label="${esc(d.label)}${d.date===t?' (heute)':''}">${WD[dt.getUTCDay()]}<small>${dt.getUTCDate()}.</small><i class="s-${st}">${MARK[st]||''}</i></button>`}).join('')}
+function updStrip(){const s=$('#strip');if(s)s.innerHTML=stripHtml()}
+function slideW(){const w=$('#swipe');return w?w.clientWidth:1}
+function goDay(i,smooth){const w=$('#swipe');if(!w)return;i=Math.max(0,Math.min(PLAN.days.length-1,i));CUR=i;updStrip();
+  const top=w.getBoundingClientRect().top+window.scrollY-(parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--hh'))||60)-60;
+  if(smooth){w.scrollTo({left:i*slideW(),behavior:'smooth'});if(window.scrollY>top)window.scrollTo({top:Math.max(0,top),behavior:'smooth'})}else w.scrollLeft=i*slideW()}
+function setHH(){const h=document.querySelector('header');if(h)document.documentElement.style.setProperty('--hh',h.offsetHeight+'px')}
 function renderWeek(only){
   if(only!=null&&$('#day'+only)){const el=$('#day'+only);el.outerHTML=dayCard(only);const n=$('#day'+only);n.classList.add('swap');summary();return}
   const done=AUSW.days.filter(d=>d.status==='bestaetigt').length;
   let h=`${OFFLINE?'<div class="banner warn">Offline – du siehst den zuletzt geladenen Stand. Änderungen werden gespeichert, sobald wieder Netz da ist.</div>':''}<div id="saveErr" class="hidden"></div>
   <p class="note" id="sum"></p>${PLAN.hint?`<p class="note">${esc(PLAN.hint)}</p>`:''}`;
-  PLAN.days.forEach((d,i)=>{h+=dayHead(i)+dayCard(i)});
-  $('#main').innerHTML=h;summary();renderErrBox()}
-function summary(){const s=$('#sum');if(!s)return;const n=AUSW.days.filter(d=>d.status==='bestaetigt').length;s.innerHTML=`<b>${n} von 7 Tagen bestätigt.</b> Ablehnen zeigt sofort einen passenden Ersatz. Alles wird automatisch gespeichert.`}
+  const ti=todayIdx();if(CUR==null||CUR_TODAY!==ti||CUR>=PLAN.days.length)CUR=ti;CUR_TODAY=ti;
+  h+=`<nav class="strip" id="strip" aria-label="Tage">${stripHtml()}</nav><div class="swipe" id="swipe">`;
+  PLAN.days.forEach((d,i)=>{h+=`<div class="slide" data-i="${i}">${dayHead(i)}${dayCard(i)}</div>`});
+  h+='</div><p class="hint">← wischen für andere Tage →</p>';
+  $('#main').innerHTML=h;setHH();summary();renderErrBox();goDay(CUR,false);
+  const w=$('#swipe');let tm=null;w.addEventListener('scroll',()=>{clearTimeout(tm);tm=setTimeout(()=>{const i=Math.round(w.scrollLeft/slideW());if(i!==CUR){CUR=i;updStrip()}},60)},{passive:true})}
+function summary(){const s=$('#sum');if(!s)return;const n=AUSW.days.filter(d=>d.status==='bestaetigt').length;s.innerHTML=`<b>${n} von ${AUSW.days.length} Tagen bestätigt.</b> Ablehnen zeigt sofort einen passenden Ersatz. Alles wird automatisch gespeichert.`;updStrip()}
 
 // Einkaufsliste aus bestätigten Gerichten
 const CATS=[['Obst & Gemüse',/kohl|kürbis|zucchini|zwiebel|knoblauch|ingwer|paprika|möhre|lauch|sellerie|spinat|salat|brokkoli|rosenkohl|champignon|pilz|seitling|fenchel|bete|apfel|zitrone|petersilie|schnittlauch|kartoffel|gurke|tomate|erbsen tk|edamame/i],['Kühlregal & Eier',/tofu|tempeh|ei$|eier|käse|parmesan|feta|gorgonzola|quark|joghurt|frischkäse|gnocchi|schupfnudeln|würstchen|medaillons|hafer-cuisine|hafermilch/i],['Vorratsschrank',/.*/]];
@@ -308,7 +338,8 @@ function setTabs(){$('#tabs').classList.remove('hidden');document.querySelectorA
 document.addEventListener('click',async e=>{
   const tb=e.target.closest('#tabs button');if(tb){TAB=tb.dataset.tab;render();window.scrollTo(0,0);return}
   const t=e.target.closest('[data-act]');if(!t)return;const a=t.dataset.act,i=+t.dataset.i;
-  if(a==='ok'||a==='no'||a==='reset'){act(i,a);if(t.dataset.close){closeSheet();const el=$('#day'+i);if(el)el.scrollIntoView({block:'center'})}}
+  if(a==='ok'||a==='no'||a==='reset'){act(i,a);if(t.dataset.close){closeSheet();goDay(i,false)}}
+  else if(a==='jump')goDay(i,true);
   else if(a==='detail')detail(i);
   else if(a==='close')closeSheet();
   else if(a==='retry')doSave();
@@ -328,9 +359,13 @@ document.addEventListener('click',async e=>{
 });
 document.addEventListener('change',e=>{const c=e.target.closest('[data-ck]');if(!c)return;const k=LS_CHECK+PLAN.week,o=JSON.parse(localStorage.getItem(k)||'{}');if(c.checked)o[c.dataset.ck]=1;else delete o[c.dataset.ck];localStorage.setItem(k,JSON.stringify(o));c.closest('li').classList.toggle('chk',c.checked)});
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&ghCfg()&&SAVE.state!=='busy'&&SAVE.state!=='pending'){if(SAVE.state==='err')doSave();else load()}});
+window.addEventListener('resize',()=>{if(TAB==='woche'&&$('#swipe')&&CUR!=null){setHH();goDay(CUR,false)}});
 window.addEventListener('online',()=>{if(SAVE.state==='err')doSave()});
 $('#saveChip').addEventListener('click',()=>{if(SAVE.state==='err')doSave()});
-if('serviceWorker' in navigator&&location.protocol==='https:')navigator.serviceWorker.register('sw.js').catch(()=>{});
+if('serviceWorker' in navigator&&location.protocol==='https:'){navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(reg=>{reg.update().catch(()=>{});document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')reg.update().catch(()=>{})})}).catch(()=>{});
+  // Neue App-Version aktiv -> einmal neu laden (nur wenn nichts ungespeichert ist)
+  let reloaded=false;navigator.serviceWorker.addEventListener('controllerchange',()=>{if(reloaded)return;const go=()=>{if(SAVE.state==='pending'||SAVE.state==='busy'){setTimeout(go,800);return}reloaded=true;location.reload()};if(hadCtrl)go()});
+  var hadCtrl=!!navigator.serviceWorker.controller}
 if(location.hash==='#rezept')history.replaceState(null,'',location.pathname);
 render();load();
 </script>
