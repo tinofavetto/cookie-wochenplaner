@@ -1,6 +1,6 @@
 # Cookies Wochenplaner
 
-Kleine Wochenplaner-App (Deutsch, fürs iPhone gemacht) als installierbare Web-App (PWA): Gerichte der Woche bestätigen oder ablehnen (mit sofortigem Ersatzvorschlag), Rezepte mit Zutaten und Schritten, Einkaufsliste aus den bestätigten Gerichten.
+Kleine Wochenplaner-App (Deutsch, fürs iPhone gemacht) als installierbare Web-App (PWA): Pro Tag ein Hauptgericht und ein schnelles Abendessen bestätigen oder ablehnen (mit sofortigem Ersatzvorschlag), Rezepte mit Zutaten und Schritten, Tagessumme gegen ein Tagesziel, Einkaufsliste aus den bestätigten Gerichten.
 
 **Enthält keine persönlichen Daten.** In diesem Repo liegen nur App-Code, Icons und allgemeine Rezeptbilder. Wochenpläne, Rezepte, Nährwerte und die Auswahl liegen in einem separaten **privaten** Repository und werden erst geladen, wenn in der App ein eigener GitHub-Schlüssel (fine-grained personal access token, nur dieses private Repo, „Contents: Read and write“) eingetragen ist. Der Schlüssel wird nur im Browser des Geräts (localStorage) gespeichert. Ohne Schlüssel zeigt die App nur die Einrichtung.
 
@@ -17,6 +17,24 @@ Alle Bilder stammen von Wikimedia Commons, wurden auf 480 × 360 px zugeschnitte
 
 | Datei | Original | Urheber | Lizenz |
 |---|---|---|---|
+| `img/abend-avocado-dip-teller.webp` | [Guacamole in a bowl by Jon Sullivan (4 April 2004).jpg](https://commons.wikimedia.org/wiki/File:Guacamole_in_a_bowl_by_Jon_Sullivan_(4_April_2004).jpg) | Jon Sullivan | Public domain |
+| `img/abend-avocado-ei-brot.webp` | [Skinny-Fried-Egg-and-Avocado-Toast (35944260285).jpg](https://commons.wikimedia.org/wiki/File:Skinny-Fried-Egg-and-Avocado-Toast_(35944260285).jpg) | Meg H | [CC BY 2.0](https://creativecommons.org/licenses/by/2.0) |
+| `img/abend-bohnen-wrap.webp` | [Pinto Bean and Spinach Burrito (5034780791).jpg](https://commons.wikimedia.org/wiki/File:Pinto_Bean_and_Spinach_Burrito_(5034780791).jpg) | Vegan Feast Catering | [CC BY 2.0](https://creativecommons.org/licenses/by/2.0) |
+| `img/abend-bohnensalat-ei.webp` | [White bean mediterranean salad.jpg](https://commons.wikimedia.org/wiki/File:White_bean_mediterranean_salad.jpg) | gran | [CC BY 3.0](https://creativecommons.org/licenses/by/3.0) |
+| `img/abend-brot-ei-quark.webp` | [Egg Sandwich.jpg](https://commons.wikimedia.org/wiki/File:Egg_Sandwich.jpg) | David Gossow | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0) |
+| `img/abend-edamame-bowl.webp` | [Corn And Edamame Sesame Salad (140491193).jpeg](https://commons.wikimedia.org/wiki/File:Corn_And_Edamame_Sesame_Salad_(140491193).jpeg) | J Doll | [CC BY 3.0](https://creativecommons.org/licenses/by/3.0) |
+| `img/abend-eiersalat-brot.webp` | [Egg salad sandwich - cropped.jpg](https://commons.wikimedia.org/wiki/File:Egg_salad_sandwich_-_cropped.jpg) | jill, jellidonut... whatever from Raleigh, NC, USA | [CC BY 2.5](https://creativecommons.org/licenses/by/2.5) |
+| `img/abend-kartoffelsalat-bohnen.webp` | [Potato salad 3.jpg](https://commons.wikimedia.org/wiki/File:Potato_salad_3.jpg) | jules | [CC BY 2.0](https://creativecommons.org/licenses/by/2.0) |
+| `img/abend-kichererbsen-spinat-ei.webp` | [Spinat mit Kichererbsen, Ziegenkäse und Erdnüssen in Schüssel.jpg](https://commons.wikimedia.org/wiki/File:Spinat_mit_Kichererbsen,_Ziegenk%C3%A4se_und_Erdn%C3%BCssen_in_Sch%C3%BCssel.jpg) | Conrad Nutschan | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0) |
+| `img/abend-linsen-edamame-salat.webp` | [Salade de lentilles, potimarron rôti et Feta.jpg](https://commons.wikimedia.org/wiki/File:Salade_de_lentilles,_potimarron_r%C3%B4ti_et_Feta.jpg) | Benoît Prieur | [CC0](http://creativecommons.org/publicdomain/zero/1.0/deed.en) |
+| `img/abend-mozzarella-brot.webp` | [Tosty mozzarella pesto.jpg](https://commons.wikimedia.org/wiki/File:Tosty_mozzarella_pesto.jpg) | MOs810 | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0) |
+| `img/abend-ofengemuese-feta.webp` | [Couscous with Roasted Vegetables & Feta.jpg](https://commons.wikimedia.org/wiki/File:Couscous_with_Roasted_Vegetables_%26_Feta.jpg) | Lori L. Stalteri | [CC BY 2.0](https://creativecommons.org/licenses/by/2.0) |
+| `img/abend-omelett-gemuese.webp` | [Vegetable Omelette with slice of bread and chutney.JPG](https://commons.wikimedia.org/wiki/File:Vegetable_Omelette_with_slice_of_bread_and_chutney.JPG) | TriptaG | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0) |
+| `img/abend-pellkartoffeln-quark.webp` | [Pellkartoffeln mit Quark 2.JPG](https://commons.wikimedia.org/wiki/File:Pellkartoffeln_mit_Quark_2.JPG) | Dr. Bernd Gross | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0) |
+| `img/abend-ruehrei-paprika.webp` | [Scrambled eggs on toast - Joe's Cafe 2024-04-14.jpg](https://commons.wikimedia.org/wiki/File:Scrambled_eggs_on_toast_-_Joe%27s_Cafe_2024-04-14.jpg) | Andy Li | [CC0](http://creativecommons.org/publicdomain/zero/1.0/deed.en) |
+| `img/abend-soja-gyros-wrap.webp` | [Falafel &Tzatziki Wrap - Lavash.jpg](https://commons.wikimedia.org/wiki/File:Falafel_%26Tzatziki_Wrap_-_Lavash.jpg) | Andy Li | [CC0](http://creativecommons.org/publicdomain/zero/1.0/deed.en) |
+| `img/abend-tofu-ruehrei.webp` | [Tofu Scramble in New Orleans.jpg](https://commons.wikimedia.org/wiki/File:Tofu_Scramble_in_New_Orleans.jpg) | Bart Everson | [CC BY 2.0](https://creativecommons.org/licenses/by/2.0) |
+| `img/abend-tofu-sandwich.webp` | [Tofu sandwich.jpg](https://commons.wikimedia.org/wiki/File:Tofu_sandwich.jpg) | https://www.flickr.com/photos/stuart_spivack/ | [CC BY-SA 2.0](https://creativecommons.org/licenses/by-sa/2.0) |
 | `img/blumenkohl-curry.webp` | [Curried cauliflower and chickpea stew.jpg](https://commons.wikimedia.org/wiki/File:Curried_cauliflower_and_chickpea_stew.jpg) | Jim Reynolds from Cleveland, USA | [CC BY 2.0](https://creativecommons.org/licenses/by/2.0) |
 | `img/butternut-gefuellt.webp` | [Butternut squash stuffed shells with toasted pecan and sage brown butter (3869054302).jpg](https://commons.wikimedia.org/wiki/File:Butternut_squash_stuffed_shells_with_toasted_pecan_and_sage_brown_butter_(3869054302).jpg) | Karen and Brad Emerson | [CC BY 2.0](https://creativecommons.org/licenses/by/2.0) |
 | `img/chili-sin-carne.webp` | [ChiliSinCarne.jpg](https://commons.wikimedia.org/wiki/File:ChiliSinCarne.jpg) | Charles Brooking | Public domain |
@@ -50,7 +68,7 @@ Alle Bilder stammen von Wikimedia Commons, wurden auf 480 × 360 px zugeschnitte
 | `img/rote-bete-ofen.webp` | [Roasted beetroot.jpg](https://commons.wikimedia.org/wiki/File:Roasted_beetroot.jpg) | Jacknstock | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0) |
 | `img/rotkohl-tempeh.webp` | [Modra kapusta po poznansku.jpg](https://commons.wikimedia.org/wiki/File:Modra_kapusta_po_poznansku.jpg) | MOs810 | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0) |
 | `img/ruehrei.webp` | [Liat Portal for Foodie Disorder - Breakfast in Israel scrambled eggs with herbs and vegetables.jpg](https://commons.wikimedia.org/wiki/File:Liat_Portal_for_Foodie_Disorder_-_Breakfast_in_Israel_scrambled_eggs_with_herbs_and_vegetables.jpg) | HaJunkiyada | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0) |
-| `img/spitzkohl-pfanne.webp` | [Bratkartoffeln 1024 768.jpg](https://commons.wikimedia.org/wiki/File:Bratkartoffeln_1024_768.jpg) | Eckhard Polesny ( ? Metzecki at de.wikipedia) | Public domain |
+| `img/spitzkohl-pfanne.webp` | [Bratkartoffeln 1024 768.jpg](https://commons.wikimedia.org/wiki/File:Bratkartoffeln_1024_768.jpg) | Eckhard Polesny ( ? Metzecki at de.wikipedia) | Public domain |
 | `img/spitzkohl-schupfnudeln.webp` | [Schupfnudeln mit Sauerkraut.jpg](https://commons.wikimedia.org/wiki/File:Schupfnudeln_mit_Sauerkraut.jpg) | MarkusHagenlocher | [CC BY-SA 3.0](http://creativecommons.org/licenses/by-sa/3.0/) |
 | `img/tempeh-gruenkohl.webp` | [Boerenkool stamppot with turkey ham instead of bacon 2.jpg](https://commons.wikimedia.org/wiki/File:Boerenkool_stamppot_with_turkey_ham_instead_of_bacon_2.jpg) | GrammarFascist | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0) |
 | `img/teriyaki-tofu.webp` | [Baked Tofu with Broccoli and Rice.jpg](https://commons.wikimedia.org/wiki/File:Baked_Tofu_with_Broccoli_and_Rice.jpg) | Miscellaneous contributor | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0) |
