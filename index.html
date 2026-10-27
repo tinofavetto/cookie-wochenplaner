@@ -1,0 +1,338 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#2e7d32">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Wochenplaner">
+<meta name="robots" content="noindex">
+<title>Cookies Wochenplaner</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" href="icon-192.png">
+<style>
+:root{--bg:#f7f5ef;--card:#fff;--ink:#1f2a1f;--mut:#6b7468;--line:#e6e2d6;--g:#2e7d32;--g2:#e8f3e6;--o:#e8772e;--o2:#fdeee3;--r:#b3261e;--r2:#fbe9e7;--rad:18px;--sh:0 2px 10px rgba(40,50,30,.08)}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;-webkit-text-size-adjust:100%}
+button,input{font:inherit}
+a{color:var(--g)}
+header{position:sticky;top:0;z-index:5;background:rgba(247,245,239,.94);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);padding:calc(env(safe-area-inset-top) + 10px) 16px 10px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px}
+header img{width:34px;height:34px;border-radius:9px}
+header .t{flex:1;min-width:0}
+header h1{font-size:18px;margin:0;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+header .sub{font-size:13px;color:var(--mut)}
+.chip{font-size:12px;padding:5px 9px;border-radius:99px;background:#eee;color:var(--mut);white-space:nowrap;border:0}
+.chip.ok{background:var(--g2);color:var(--g)}.chip.busy{background:#fff4d6;color:#8a6100}.chip.err{background:var(--r2);color:var(--r)}
+main{padding:12px 14px calc(90px + env(safe-area-inset-bottom));max-width:640px;margin:0 auto}
+nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:6;background:#fff;border-top:1px solid var(--line);display:flex;padding:6px 6px calc(6px + env(safe-area-inset-bottom))}
+nav.tabs button{flex:1;border:0;background:none;padding:8px 4px;color:var(--mut);font-size:12px;display:flex;flex-direction:column;align-items:center;gap:2px;min-height:48px}
+nav.tabs button svg{width:24px;height:24px}
+nav.tabs button.on{color:var(--g);font-weight:600}
+.card{background:var(--card);border-radius:var(--rad);box-shadow:var(--sh);margin:0 0 16px;overflow:hidden}
+.pad{padding:14px 16px}
+.day{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:4px 2px 8px}
+.day b{font-size:15px}.day span{font-size:13px;color:var(--mut)}
+.pic{position:relative;aspect-ratio:16/10;background:linear-gradient(135deg,#dfe9d3,#f3e3c7);display:block;width:100%;border:0;padding:0;cursor:pointer}
+.pic img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.pic .ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:40px;color:#9aa58f}
+.badge{display:inline-block;font-size:12px;font-weight:600;padding:4px 9px;border-radius:99px;background:var(--g2);color:var(--g)}
+.badge.o{background:var(--o2);color:#a2470f}.badge.r{background:var(--r2);color:var(--r)}.badge.n{background:#eef0ea;color:var(--mut)}
+.pic .badges{position:absolute;left:10px;top:10px;display:flex;gap:6px;flex-wrap:wrap}
+.pic .badges .badge{box-shadow:0 1px 4px rgba(0,0,0,.15);background:#fff}
+h2{font-size:19px;margin:0 0 6px;line-height:1.25}
+h3{font-size:16px;margin:18px 0 8px}
+.desc{color:#3c463a;font-size:14.5px;margin:0 0 10px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.nut{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0 12px}
+.nut div{background:#f6f7f2;border-radius:12px;padding:8px 10px;font-size:13px;color:var(--mut)}
+.nut b{display:block;color:var(--ink);font-size:15px}
+.btns{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.btn{border:0;border-radius:14px;padding:13px 10px;font-weight:600;font-size:15.5px;min-height:48px;cursor:pointer}
+.btn.ok{background:var(--g);color:#fff}.btn.ok.done{background:var(--g2);color:var(--g)}
+.btn.no{background:#fff;color:var(--r);border:1.5px solid #e7c3bf}
+.btn.sec{background:#eef0ea;color:var(--ink)}
+.btn.full{width:100%}
+.more{background:none;border:0;color:var(--g);font-weight:600;padding:8px 0 0;font-size:14px}
+.note{font-size:13.5px;color:var(--mut);margin:0 0 14px}
+.banner{border-radius:14px;padding:12px 14px;margin:0 0 14px;font-size:14px}
+.banner.err{background:var(--r2);color:var(--r)}.banner.info{background:var(--g2);color:#1e5b22}.banner.warn{background:#fff4d6;color:#7a5600}
+.swap{animation:pop .45s ease}
+@keyframes pop{0%{opacity:.2;transform:scale(.98)}100%{opacity:1;transform:none}}
+.list{list-style:none;margin:0;padding:0}
+.list li{display:flex;align-items:flex-start;gap:12px;padding:11px 2px;border-bottom:1px solid var(--line);font-size:15px}
+.list li:last-child{border-bottom:0}
+.list input{width:22px;height:22px;accent-color:var(--g);flex:none;margin-top:1px}
+.list .amt{color:var(--mut);white-space:nowrap}
+.list .off{display:block;font-size:12px;color:#a2470f}
+.list li.chk span{text-decoration:line-through;color:var(--mut)}
+.grp{font-size:13px;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.04em;margin:18px 4px 6px}
+.sheet{position:fixed;inset:0;z-index:20;background:var(--bg);overflow-y:auto;-webkit-overflow-scrolling:touch;animation:up .25s ease}
+@keyframes up{from{transform:translateY(30px);opacity:0}to{transform:none;opacity:1}}
+.sheet .pic{aspect-ratio:4/3}
+.close{position:fixed;top:calc(env(safe-area-inset-top) + 10px);right:12px;z-index:21;width:44px;height:44px;border-radius:50%;border:0;background:rgba(255,255,255,.95);box-shadow:var(--sh);font-size:22px}
+table.ing{width:100%;border-collapse:collapse;font-size:14px}
+table.ing th{text-align:left;font-size:12px;color:var(--mut);font-weight:600;padding:6px 4px;border-bottom:1px solid var(--line)}
+table.ing td{padding:8px 4px;border-bottom:1px solid var(--line);vertical-align:top}
+table.ing td.n{white-space:nowrap;text-align:right;color:#3c463a}
+table.ing th.n{text-align:right}
+ol.steps{padding:0;margin:0;list-style:none;counter-reset:s}
+ol.steps li{counter-increment:s;position:relative;padding:0 0 14px 40px;font-size:15px}
+ol.steps li:before{content:counter(s);position:absolute;left:0;top:-2px;width:28px;height:28px;border-radius:50%;background:var(--g);color:#fff;font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center}
+.portion{font-size:14px;margin:4px 0}
+label.lbl{display:block;font-weight:600;font-size:14px;margin:12px 0 6px}
+input.tok{width:100%;padding:13px 12px;border:1.5px solid var(--line);border-radius:12px;background:#fff;font-size:16px}
+ol.how{padding-left:20px;margin:6px 0;font-size:14.5px}ol.how li{margin:0 0 6px}
+.hero{text-align:center;padding:26px 18px 8px}
+.hero img{width:84px;height:84px;border-radius:20px}
+.small{font-size:13px;color:var(--mut)}
+.row{display:flex;gap:10px}.row>*{flex:1}
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+<header>
+  <img src="icon-192.png" alt="">
+  <div class="t"><h1 id="hTitle">Cookies Wochenplaner</h1><div class="sub" id="hSub">Euer Essen für die Woche</div></div>
+  <button class="chip hidden" id="saveChip" type="button"></button>
+</header>
+<main id="main" aria-live="polite"></main>
+<nav class="tabs hidden" id="tabs">
+  <button data-tab="woche" class="on" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="17" rx="3"/><path d="M3 9h18M8 2v4M16 2v4"/></svg>Woche</button>
+  <button data-tab="einkauf" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6h15l-1.5 9h-12z"/><path d="M6 6 5 3H2"/><circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/></svg>Einkauf</button>
+  <button data-tab="einstellungen" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>Einstellungen</button>
+</nav>
+<div id="sheet"></div>
+<script>
+'use strict';
+// ====== Cookies Wochenplaner ======
+// Diese App enthält KEINE persönlichen Daten. Plan und Auswahl liegen im PRIVATEN Repo GH_REPO
+// und werden nur mit dem GitHub-Schlüssel geladen, der ausschließlich auf diesem Gerät (localStorage) gespeichert ist.
+const APP_VER='1.0.0';
+const GH_REPO='tinofavetto/cookie-wochenplaner-daten';
+const LS_GH='cwp.gh', LS_CACHE='cwp.cache', LS_CHECK='cwp.check.';
+const $=s=>document.querySelector(s);
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let PLAN=null, AUSW=null, AUSW_SHA=null, TAB='woche', LOADERR=null, OFFLINE=false;
+let SAVE={state:'idle',timer:null,busy:false,again:false,err:'',at:null};
+
+// ---------- Schlüssel ----------
+function ghCfg(){try{const c=JSON.parse(localStorage.getItem(LS_GH)||'null');return c&&c.token?c:null}catch(e){return null}}
+function setGhCfg(c){if(c)localStorage.setItem(LS_GH,JSON.stringify(c));else localStorage.removeItem(LS_GH)}
+function clearAll(){setGhCfg(null);localStorage.removeItem(LS_CACHE);Object.keys(localStorage).filter(k=>k.startsWith(LS_CHECK)).forEach(k=>localStorage.removeItem(k));PLAN=null;AUSW=null;AUSW_SHA=null}
+
+// ---------- GitHub (Contents API) ----------
+function b64enc(str){const u=new TextEncoder().encode(str);let b='';for(let i=0;i<u.length;i+=0x8000)b+=String.fromCharCode.apply(null,u.subarray(i,i+0x8000));return btoa(b)}
+function b64dec(b){const bin=atob(String(b).replace(/\s/g,''));const u=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);return new TextDecoder().decode(u)}
+function ghErr(st,msg){const m={401:'Der Schlüssel ist falsch oder abgelaufen (HTTP 401).',403:'Der Schlüssel darf auf cookie-wochenplaner-daten nicht zugreifen (HTTP 403). Bei „Repository access“ das Repo wählen und „Contents: Read and write“ geben.',404:'Nichts gefunden oder kein Zugriff auf cookie-wochenplaner-daten (HTTP 404). Prüfe beim Schlüssel „Only select repositories“ → cookie-wochenplaner-daten.',409:'Gleichzeitige Änderung (HTTP 409).',422:'GitHub hat die Datei abgelehnt (HTTP 422).'}[st];const e=new Error(m||('GitHub-Fehler HTTP '+st+(msg?' – '+msg:'')));e.status=st;return e}
+async function gh(path,opt,cfg){cfg=cfg||ghCfg();const url='https://api.github.com/repos/'+GH_REPO+(path?'/contents/'+path.split('/').map(encodeURIComponent).join('/'):'');
+  try{return await fetch(url+(opt&&opt.method==='PUT'?'':(path?'?ref=main':'')),{...opt,cache:'no-store',headers:{'Authorization':'Bearer '+cfg.token,'Accept':'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28',...(opt&&opt.body?{'Content-Type':'application/json'}:{})}})}
+  catch(e){const err=new Error('Keine Verbindung zu GitHub.');err.net=true;throw err}}
+async function ghGet(path,cfg){const r=await gh(path,{method:'GET'},cfg);if(r.status===404)return null;if(!r.ok){let t='';try{t=(await r.json()).message}catch(e){}throw ghErr(r.status,t)}const j=await r.json();return {data:JSON.parse(b64dec(j.content)),sha:j.sha}}
+async function ghPut(path,obj,msg,sha,cfg){const body={message:msg,branch:'main',content:b64enc(JSON.stringify(obj,null,1)+'\n')};if(sha)body.sha=sha;
+  const r=await gh(path,{method:'PUT',body:JSON.stringify(body)},cfg);if(!r.ok){let t='';try{t=(await r.json()).message}catch(e){}throw ghErr(r.status,t)}const j=await r.json();return j.content&&j.content.sha}
+async function repoPrivate(cfg){const r=await gh('',{method:'GET'},cfg);if(!r.ok){let t='';try{t=(await r.json()).message}catch(e){}throw ghErr(r.status,t)}return !!(await r.json()).private}
+
+// ---------- Daten laden ----------
+function cache(){try{return JSON.parse(localStorage.getItem(LS_CACHE)||'null')}catch(e){return null}}
+function saveCache(){try{localStorage.setItem(LS_CACHE,JSON.stringify({plan:PLAN,ausw:AUSW,sha:AUSW_SHA,at:Date.now()}))}catch(e){}}
+function auswPath(){return 'auswahl/'+PLAN.week+'.json'}
+function initAusw(){const now=new Date().toISOString();return {kind:'cookie-auswahl',schema:1,week:PLAN.week,plan:'plan/'+PLAN.week+'.json',updatedAt:now,by:'app',days:PLAN.days.map(d=>({idx:d.idx,date:d.date,original:d.recipe,recipe:d.recipe,status:'offen',rejected:[],at:null}))}}
+async function load(){
+  const cfg=ghCfg();if(!cfg){render();return}
+  const c=cache();if(c&&c.plan&&!PLAN){PLAN=c.plan;AUSW=c.ausw;AUSW_SHA=c.sha;render()}
+  if(!PLAN)renderLoading();
+  try{
+    const p=await ghGet('plan/current.json',cfg);
+    if(!p||!p.data||p.data.kind!=='cookie-wochenplan')throw new Error('Im privaten Repo liegt noch kein Plan (plan/current.json). Cookie legt ihn sonntags an.');
+    const changedWeek=!PLAN||PLAN.week!==p.data.week;PLAN=p.data;
+    const a=await ghGet(auswPath(),cfg);
+    if(a&&a.data){AUSW=normalize(a.data);AUSW_SHA=a.sha}else if(changedWeek||!AUSW||AUSW.week!==PLAN.week){AUSW=initAusw();AUSW_SHA=null}
+    LOADERR=null;OFFLINE=false;saveCache();
+  }catch(e){if(e.net&&PLAN){OFFLINE=true}else{LOADERR=e;if(!e.net){PLAN=null;AUSW=null}}}
+  render();
+}
+function normalize(a){const by={};(a.days||[]).forEach(d=>by[d.idx]=d);a.days=PLAN.days.map(d=>Object.assign({idx:d.idx,date:d.date,original:d.recipe,recipe:d.recipe,status:'offen',rejected:[],at:null},by[d.idx]||{}));return a}
+
+// ---------- Ersatz-Logik ----------
+function R(id){return PLAN&&PLAN.recipes[id]}
+function P(n){const p=(PLAN&&PLAN.people)||[];return p[n]||{key:'p'+n,name:'Person '+(n+1),share:n?.4:.6}}
+function N(r,n){return r[P(n).key]||{}}
+function pickReplacement(i){
+  const day=PLAN.days[i],st=AUSW.days[i],crit=PLAN.criteria||{},ref=R(st.original)||R(st.recipe);
+  const usedElse=new Set(AUSW.days.filter((x,j)=>j!==i&&x.recipe).map(x=>x.recipe));
+  const no=new Set([...(st.rejected||[]),st.recipe,st.original]);
+  let c=[...new Set([...(PLAN.pool||[]),...PLAN.days.map(d=>d.recipe)])].filter(id=>R(id)&&!usedElse.has(id)&&!no.has(id));
+  if(day.office&&crit.officeNeedsPrep!==false)c=c.filter(id=>R(id).prep);
+  const k=id=>N(R(id),0).kcal,p=id=>N(R(id),0).p,rk=N(ref,0).kcal,rp=N(ref,0).p;
+  const strict=c.filter(id=>k(id)>=(crit.kcalMin||0)&&k(id)<=(crit.kcalMax||9999)&&p(id)>=(crit.pMin||0)&&Math.abs(k(id)-rk)<=(crit.kcalTol||9999));
+  const pool=strict.length?strict:c.filter(id=>p(id)>=(crit.pMin||0)-5);
+  if(!pool.length)return null;
+  pool.sort((a,b)=>(Math.abs(k(a)-rk)/10+Math.abs(p(a)-rp))-(Math.abs(k(b)-rk)/10+Math.abs(p(b)-rp)));
+  return pool[0];
+}
+function act(i,what){
+  const st=AUSW.days[i];const now=new Date().toISOString();
+  if(what==='ok'){if(!st.recipe)return;st.status='bestaetigt';st.at=now}
+  else if(what==='no'){
+    if(st.recipe&&!st.rejected.includes(st.recipe))st.rejected.push(st.recipe);
+    const n=pickReplacement(i);
+    if(n){st.recipe=n;st.status='ersetzt'}else{st.recipe=null;st.status='abgelehnt'}
+    st.at=now;
+  }else if(what==='reset'){st.recipe=st.original;st.rejected=[];st.status='offen';st.at=now}
+  AUSW.updatedAt=now;AUSW.by='app';saveCache();renderWeek(i);scheduleSave();
+}
+
+// ---------- Speichern (entprellt) ----------
+function scheduleSave(){SAVE.state='pending';chip();clearTimeout(SAVE.timer);SAVE.timer=setTimeout(doSave,700)}
+async function doSave(){
+  if(SAVE.busy){SAVE.again=true;return}SAVE.busy=true;SAVE.state='busy';chip();
+  try{
+    const msg='Auswahl '+PLAN.week+' aus der App';
+    try{AUSW_SHA=await ghPut(auswPath(),AUSW,msg,AUSW_SHA)}
+    catch(e){if(e.status===409||e.status===422||(e.status===404&&AUSW_SHA)){const rem=await ghGet(auswPath());if(rem&&rem.data){merge(rem.data);AUSW_SHA=rem.sha}else AUSW_SHA=null;AUSW_SHA=await ghPut(auswPath(),AUSW,msg,AUSW_SHA)}else throw e}
+    SAVE.state='ok';SAVE.err='';SAVE.at=new Date();saveCache();
+  }catch(e){SAVE.state='err';SAVE.err=e.message||String(e)}
+  SAVE.busy=false;chip();if(TAB==='woche')renderErrBox();
+  if(SAVE.again){SAVE.again=false;doSave()}
+}
+function merge(remote){(remote.days||[]).forEach(r=>{const l=AUSW.days[r.idx];if(l&&r.at&&(!l.at||r.at>l.at))AUSW.days[r.idx]=Object.assign({},l,r)})}
+function chip(){const c=$('#saveChip');if(!PLAN||!ghCfg()){c.classList.add('hidden');return}c.classList.remove('hidden');
+  const t={idle:['n','Synchron'],pending:['busy','Ungespeichert …'],busy:['busy','Speichert …'],ok:['ok','✓ gespeichert'+(SAVE.at?' '+SAVE.at.toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'}):'')],err:['err','⚠ Nicht gespeichert']}[SAVE.state];
+  if(OFFLINE&&SAVE.state==='idle'){t[0]='err';t[1]='Offline'}
+  c.className='chip '+t[0];c.textContent=t[1];c.dataset.state=SAVE.state}
+function renderErrBox(){const b=$('#saveErr');if(!b)return;if(SAVE.state==='err'){b.className='banner err';b.innerHTML='<b>Speichern fehlgeschlagen:</b> '+esc(SAVE.err)+'<div style="margin-top:8px"><button class="btn sec" type="button" data-act="retry">Nochmal versuchen</button></div>'}else{b.className='hidden';b.innerHTML=''}}
+
+// ---------- Darstellung ----------
+const stLabel={offen:['n','Offen'],bestaetigt:['','✓ Bestätigt'],ersetzt:['o','Neuer Vorschlag'],abgelehnt:['r','Abgelehnt']};
+function imgTag(r){return '<div class="ph">🍽</div>'+(r?`<img src="img/${esc(r.img||r.id)}.webp" alt="" loading="lazy" onerror="this.remove()">`:'')}
+function dayCard(i){
+  const d=PLAN.days[i],st=AUSW.days[i],r=R(st.recipe),[cls,lab]=stLabel[st.status]||stLabel.offen;
+  let h=`<section class="card" id="day${i}"><button class="pic" type="button" data-act="detail" data-i="${i}" aria-label="Rezept ansehen">${imgTag(r)}<div class="badges"><span class="badge ${cls}">${lab}</span>${d.office?'<span class="badge n">Büro-Box</span>':''}</div></button><div class="pad">`;
+  if(!r){h+=`<h2>Kein passender Ersatz mehr</h2><p class="desc">Alle passenden Rezepte wurden für diesen Tag abgelehnt. Sag Cookie Bescheid oder setz den Tag zurück.</p><button class="btn sec full" type="button" data-act="reset" data-i="${i}">Ursprüngliches Gericht zurückholen</button></div></section>`;return h}
+  h+=`<h2>${esc(r.name)}</h2><p class="desc">${esc(r.desc)}</p>
+   ${nutBox(r,false)}
+   <div class="btns"><button class="btn ok ${st.status==='bestaetigt'?'done':''}" type="button" data-act="ok" data-i="${i}">${st.status==='bestaetigt'?'✓ Bestätigt':'Bestätigen'}</button><button class="btn no" type="button" data-act="no" data-i="${i}">Ablehnen</button></div>
+   <button class="more" type="button" data-act="detail" data-i="${i}">Rezept &amp; Zutaten ›</button>`;
+  if(st.recipe!==st.original&&R(st.original))h+=`<div class="small" style="margin-top:6px">statt: ${esc(R(st.original).name)} · <button class="more" style="padding:0" type="button" data-act="reset" data-i="${i}">zurück</button></div>`;
+  return h+'</div></section>'}
+function dayHead(i){const d=PLAN.days[i];return `<div class="day" id="dh${i}"><b>${esc(d.label)}</b><span>${esc(d.note||'')}</span></div>`}
+function renderWeek(only){
+  if(only!=null&&$('#day'+only)){const el=$('#day'+only);el.outerHTML=dayCard(only);const n=$('#day'+only);n.classList.add('swap');summary();return}
+  const done=AUSW.days.filter(d=>d.status==='bestaetigt').length;
+  let h=`${OFFLINE?'<div class="banner warn">Offline – du siehst den zuletzt geladenen Stand. Änderungen werden gespeichert, sobald wieder Netz da ist.</div>':''}<div id="saveErr" class="hidden"></div>
+  <p class="note" id="sum"></p>${PLAN.hint?`<p class="note">${esc(PLAN.hint)}</p>`:''}`;
+  PLAN.days.forEach((d,i)=>{h+=dayHead(i)+dayCard(i)});
+  $('#main').innerHTML=h;summary();renderErrBox()}
+function summary(){const s=$('#sum');if(!s)return;const n=AUSW.days.filter(d=>d.status==='bestaetigt').length;s.innerHTML=`<b>${n} von 7 Tagen bestätigt.</b> Ablehnen zeigt sofort einen passenden Ersatz. Alles wird automatisch gespeichert.`}
+
+// Einkaufsliste aus bestätigten Gerichten
+const CATS=[['Obst & Gemüse',/kohl|kürbis|zucchini|zwiebel|knoblauch|ingwer|paprika|möhre|lauch|sellerie|spinat|salat|brokkoli|rosenkohl|champignon|pilz|seitling|fenchel|bete|apfel|zitrone|petersilie|schnittlauch|kartoffel|gurke|tomate|erbsen tk|edamame/i],['Kühlregal & Eier',/tofu|tempeh|ei$|eier|käse|parmesan|feta|gorgonzola|quark|joghurt|frischkäse|gnocchi|schupfnudeln|würstchen|medaillons|hafer-cuisine|hafermilch/i],['Vorratsschrank',/.*/]];
+function shopItems(){const skip=new Set(PLAN.pantry||[]),home=PLAN.atHome||[],agg={},vor={};
+  AUSW.days.forEach(d=>{if(d.status!=='bestaetigt'||!R(d.recipe))return;R(d.recipe).ing.forEach(([n,a,u])=>{if(skip.has(n))return;if(home.some(h=>n.startsWith(h))){vor[n]=1;return}const k=n+'|'+u;agg[k]=(agg[k]||0)+(+a||0)})});
+  return {items:Object.keys(agg).sort((a,b)=>a.localeCompare(b,'de')).map(k=>{const[n,u]=k.split('|');const off=Object.keys(PLAN.offers||{}).find(o=>n.startsWith(o));return {n,u,a:agg[k],off:off?PLAN.offers[off]:''}}),vor:Object.keys(vor)}}
+function fmt(a){return (Math.round(a*100)/100).toLocaleString('de-DE')}
+function renderShop(){
+  const {items,vor}=shopItems(),open=AUSW.days.filter(d=>d.status!=='bestaetigt').length,ck=JSON.parse(localStorage.getItem(LS_CHECK+PLAN.week)||'{}');
+  let h=`<h2 style="margin:6px 2px 4px">Einkaufsliste</h2><p class="note">Aus den bestätigten Gerichten, für beide. Vorrat (${esc((PLAN.pantry||[]).join(', '))}) steht nie drauf.${PLAN.offersInfo?'<br>🏷 '+esc(PLAN.offersInfo):''}</p>`;
+  if(open)h+=`<div class="banner warn">${open} ${open===1?'Tag ist':'Tage sind'} noch nicht bestätigt – deren Zutaten fehlen hier noch.</div>`;
+  if(!items.length)h+='<div class="card pad">Noch nichts bestätigt.</div>';
+  CATS.forEach(([cat,re])=>{const g=items.filter(x=>!x.done&&re.test(x.n));g.forEach(x=>x.done=1);if(!g.length)return;
+    h+=`<div class="grp">${cat}</div><div class="card pad" style="padding-top:4px;padding-bottom:4px"><ul class="list">`+g.map(x=>{const k=x.n+'|'+x.u;return `<li class="${ck[k]?'chk':''}"><input type="checkbox" data-ck="${esc(k)}" ${ck[k]?'checked':''} aria-label="${esc(x.n)}"><span><span class="amt">${fmt(x.a)} ${esc(x.u)}</span> ${esc(x.n)}${x.off?`<span class="off">🏷 ${esc(x.off)}</span>`:''}</span></li>`}).join('')+'</ul></div>'});
+  if(vor.length)h+=`<div class="grp">Aus dem Vorrat (nicht kaufen)</div><p class="note" style="margin:0 4px 14px">${esc(vor.join(' · '))}</p>`;
+  if(items.length)h+='<button class="btn sec full" type="button" data-act="copyshop">Liste kopieren</button><p class="small" style="text-align:center">Häkchen gelten nur auf diesem Gerät.</p>';
+  $('#main').innerHTML=h}
+function shopText(){return shopItems().items.map(x=>`${fmt(x.a)} ${x.u} ${x.n}`).join('\n')}
+
+// Rezept-Details
+function nutBox(r,full){return '<div class="nut">'+[0,1].map(n=>{const x=N(r,n),e=x.schaetzung?'~':'';return `<div>${esc(P(n).name)}${full&&x.schaetzung?' (Schätzung)':''}<b>${e}${x.kcal} kcal · ${e}${x.p} g Eiweiß</b>${full&&x.kh!=null?`${x.kh} g KH · ${x.f} g Fett`:''}</div>`}).join('')+'</div>'}
+function detail(i){
+  const st=AUSW.days[i],r=R(st.recipe),d=PLAN.days[i];if(!r)return;
+  const tg=(PLAN.tagesgeruest||{})[d.office?'buero':'zuhause']||[];const base=tg.filter(x=>!x.meal).reduce((s,x)=>[s[0]+(x.kcal||0),s[1]+(x.p||0)],[0,0]);
+  const skip=new Set(PLAN.pantry||[]),home=PLAN.atHome||[],sh0=P(0).share||.6,sh1=P(1).share||.4;
+  const rows=r.ing.map(([n,a,u])=>{const t=+a||0,v=(skip.has(n)||home.some(h=>n.startsWith(h)));return `<tr><td>${esc(n)}${v?' <span class="small">(Vorrat)</span>':''}</td><td class="n">${fmt(t)} ${esc(u)}</td><td class="n">${fmt(t*sh0)}</td><td class="n">${fmt(t*sh1)}</td></tr>`}).join('');
+  let h=`<button class="close" type="button" data-act="close" aria-label="Schließen">✕</button><div class="pic" style="cursor:default">${imgTag(r)}</div><main style="padding-bottom:40px">
+   <div class="small">${esc(d.label)}${d.office?' · Büro-Box':''}</div><h2 style="font-size:22px;margin-top:4px">${esc(r.name)}</h2><p style="font-size:15px;color:#3c463a">${esc(r.desc)}</p>
+   ${nutBox(r,true)}
+   ${base[0]?`<p class="small">Tag gesamt ${esc(P(0).name)} mit Tagesgerüst: ~${base[0]+N(r,0).kcal} kcal · ~${base[1]+N(r,0).p} g Eiweiß</p>`:''}
+   <h3>Portionen</h3>${[0,1].map(n=>`<div class="portion"><b>${esc(P(n).name)}:</b> ${esc(N(r,n).portion)}</div>`).join('')}
+   <h3>Zutaten</h3><table class="ing"><tr><th>Zutat</th><th class="n">Gesamt</th><th class="n">${esc(P(0).name)} ~${Math.round(sh0*100)} %</th><th class="n">${esc(P(1).name)} ~${Math.round(sh1*100)} %</th></tr>${rows}</table>
+   <h3>Zubereitung</h3><ol class="steps">${r.steps.map(s=>`<li>${esc(s)}</li>`).join('')}</ol>
+   ${r.tm?`<h3>Thermomix</h3><p style="font-size:14.5px">${esc(r.tm)}</p>`:''}${r.cookidoo?`<p><a href="${esc(r.cookidoo)}" target="_blank" rel="noopener">Rezept auf Cookidoo öffnen</a></p>`:''}
+   <div class="btns" style="margin-top:18px"><button class="btn ok ${st.status==='bestaetigt'?'done':''}" type="button" data-act="ok" data-i="${i}" data-close="1">${st.status==='bestaetigt'?'✓ Bestätigt':'Bestätigen'}</button><button class="btn no" type="button" data-act="no" data-i="${i}" data-close="1">Ablehnen</button></div></main>`;
+  const s=$('#sheet');s.className='sheet';s.innerHTML=h;s.scrollTop=0;document.body.style.overflow='hidden';history.pushState({sheet:1},'','#rezept')}
+function closeSheet(fromPop){const s=$('#sheet');if(!s.innerHTML)return;s.className='';s.innerHTML='';document.body.style.overflow='';if(!fromPop&&location.hash==='#rezept')history.back()}
+window.addEventListener('popstate',()=>closeSheet(true));
+
+// Einrichtung / Einstellungen
+function howTo(){return `<ol class="how">
+ <li>Am iPhone oder Computer bei GitHub anmelden und <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">github.com/settings/personal-access-tokens/new</a> öffnen.</li>
+ <li><b>Token name:</b> „Wochenplaner“. <b>Expiration:</b> z. B. 1 Jahr (oder „No expiration“).</li>
+ <li><b>Repository access:</b> „Only select repositories“ und nur <b>cookie-wochenplaner-daten</b> auswählen.</li>
+ <li><b>Permissions → Repository permissions → Contents:</b> „Read and write“. Sonst nichts ändern.</li>
+ <li>Unten auf „Generate token“ tippen und den Schlüssel (beginnt mit <code>github_pat_</code>) kopieren.</li>
+ <li>Hier einfügen und „Speichern &amp; testen“ tippen. Der Schlüssel bleibt nur auf diesem Gerät. Auf dem zweiten Handy genauso (eigener oder derselbe Schlüssel).</li></ol>`}
+function renderSetup(msg){
+  $('#tabs').classList.add('hidden');$('#hTitle').textContent='Cookies Wochenplaner';$('#hSub').textContent='Einrichtung';chip();
+  $('#main').innerHTML=`<div class="hero"><img src="icon-512.png" alt=""><h2 style="margin-top:14px">Willkommen!</h2><p class="note">Hier plant ihr mit Cookie euer Essen für die Woche: Gerichte bestätigen oder ablehnen, Rezepte ansehen, Einkaufsliste.</p></div>
+  <div class="card pad"><b>Einmalig: GitHub-Schlüssel einrichten</b><p class="small">Euer Plan liegt in einem privaten Speicher. Damit nur ihr ihn seht, braucht die App einen eigenen Schlüssel.</p>${howTo()}${settingsForm(msg)}</div>`}
+function settingsForm(msg){const c=ghCfg();return `<label class="lbl" for="tok">GitHub-Schlüssel</label><input class="tok" id="tok" type="password" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="${c?'gespeichert – leer lassen = behalten':'github_pat_…'}">
+  <div class="row" style="margin-top:12px"><button class="btn ok" type="button" data-act="tokSave">Speichern &amp; testen</button>${c?'<button class="btn sec" type="button" data-act="tokTest">Nur testen</button>':''}</div>
+  <div id="tokRes" style="margin-top:12px">${msg||''}</div>
+  ${c?'<button class="btn no full" style="margin-top:6px" type="button" data-act="tokDel">Schlüssel von diesem Gerät löschen</button>':''}`}
+function renderSettings(msg){
+  $('#main').innerHTML=`<h2 style="margin:6px 2px 10px">Einstellungen</h2><div class="card pad"><b>GitHub-Schlüssel</b> <span class="badge ${ghCfg()?'':'r'}">${ghCfg()?'eingerichtet':'fehlt'}</span><p class="small">Speicher: privates Repo <b>${esc(GH_REPO)}</b>. Der Schlüssel liegt nur auf diesem Gerät.</p>${settingsForm(msg)}</div>
+  <div class="card pad"><b>So erstellst du den Schlüssel</b>${howTo()}</div>
+  <div class="card pad"><b>Über die App</b><p class="small">Version ${APP_VER}. Die App selbst enthält keine persönlichen Daten. Bilder: Wikimedia Commons (freie Lizenzen, Quellen in der README des App-Repos).</p><button class="btn sec full" type="button" data-act="reload">Plan neu laden</button></div>`}
+async function testKey(cfg){
+  const out=[];
+  const priv=await repoPrivate(cfg);if(!priv)throw new Error('Das Daten-Repo ist öffentlich! Bitte auf GitHub auf „Private“ stellen – solange speichert die App nichts.');
+  out.push('Privates Repo erreichbar');
+  const p=await ghGet('plan/current.json',cfg);out.push(p?'Plan gefunden: '+esc(p.data.title||p.data.week):'Noch kein Plan im Repo');
+  const prev=await ghGet('app/verbindung.json',cfg);
+  await ghPut('app/verbindung.json',{app:'cookie-wochenplaner',version:APP_VER,test:new Date().toISOString()},'Verbindungstest aus der App',prev&&prev.sha,cfg);out.push('Schreiben klappt');
+  return out}
+function renderLoading(){$('#main').innerHTML='<div class="hero"><img src="icon-192.png" alt="" style="width:64px;height:64px"><p class="note">Lade euren Plan …</p></div>'}
+function renderError(){$('#tabs').classList.remove('hidden');
+  $('#main').innerHTML=`<div class="banner err"><b>Plan konnte nicht geladen werden.</b><br>${esc(LOADERR.message)}</div><div class="row"><button class="btn sec" type="button" data-act="reload">Nochmal laden</button><button class="btn ok" type="button" data-act="gosettings">Schlüssel prüfen</button></div>`}
+function render(){
+  if(!ghCfg()){renderSetup();return}
+  if(TAB==='einstellungen'){setTabs();renderSettings();return}
+  if(LOADERR&&!PLAN){setTabs();renderError();return}
+  if(!PLAN){renderLoading();return}
+  $('#tabs').classList.remove('hidden');$('#hTitle').textContent=PLAN.title||'Cookies Wochenplaner';$('#hSub').textContent=PLAN.range||'';setTabs();chip();
+  if(TAB==='einkauf')renderShop();else renderWeek()}
+function setTabs(){$('#tabs').classList.remove('hidden');document.querySelectorAll('#tabs button').forEach(b=>b.classList.toggle('on',b.dataset.tab===TAB))}
+
+document.addEventListener('click',async e=>{
+  const tb=e.target.closest('#tabs button');if(tb){TAB=tb.dataset.tab;render();window.scrollTo(0,0);return}
+  const t=e.target.closest('[data-act]');if(!t)return;const a=t.dataset.act,i=+t.dataset.i;
+  if(a==='ok'||a==='no'||a==='reset'){act(i,a);if(t.dataset.close){closeSheet();const el=$('#day'+i);if(el)el.scrollIntoView({block:'center'})}}
+  else if(a==='detail')detail(i);
+  else if(a==='close')closeSheet();
+  else if(a==='retry')doSave();
+  else if(a==='reload'){TAB='woche';LOADERR=null;load()}
+  else if(a==='gosettings'){TAB='einstellungen';render()}
+  else if(a==='copyshop'){try{await navigator.clipboard.writeText(shopText());t.textContent='✓ Kopiert'}catch(err){t.textContent='Kopieren nicht möglich'}}
+  else if(a==='tokSave'||a==='tokTest'){
+    const old=ghCfg(),v=$('#tok').value.trim(),tok=v||(old&&old.token)||'';const res=$('#tokRes');
+    if(!tok){res.innerHTML='<div class="banner err">Bitte den Schlüssel einfügen (beginnt mit github_pat_).</div>';return}
+    if(/\s/.test(tok)){res.innerHTML='<div class="banner err">Der Schlüssel enthält Leerzeichen – bitte nur den Schlüssel einfügen.</div>';return}
+    res.innerHTML='<div class="small">Verbinde mit GitHub …</div>';
+    try{const out=await testKey({token:tok});setGhCfg({token:tok});$('#tok').value='';
+      res.innerHTML='<div class="banner info"><b>✓ Verbunden</b><br>'+out.join('<br>')+'</div>';
+      if(!PLAN){TAB='woche';setTimeout(load,600)}else{const box=$('#tokRes');if(TAB!=='einstellungen'){TAB='einstellungen';renderSettings(box.innerHTML)}}}
+    catch(err){res.innerHTML='<div class="banner err"><b>Nicht verbunden:</b> '+esc(err.message)+'</div>'}}
+  else if(a==='tokDel'){if(confirm('Schlüssel und gespeicherten Plan von diesem Gerät löschen?')){clearAll();TAB='woche';render()}}
+});
+document.addEventListener('change',e=>{const c=e.target.closest('[data-ck]');if(!c)return;const k=LS_CHECK+PLAN.week,o=JSON.parse(localStorage.getItem(k)||'{}');if(c.checked)o[c.dataset.ck]=1;else delete o[c.dataset.ck];localStorage.setItem(k,JSON.stringify(o));c.closest('li').classList.toggle('chk',c.checked)});
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&ghCfg()&&SAVE.state!=='busy'&&SAVE.state!=='pending'){if(SAVE.state==='err')doSave();else load()}});
+window.addEventListener('online',()=>{if(SAVE.state==='err')doSave()});
+$('#saveChip').addEventListener('click',()=>{if(SAVE.state==='err')doSave()});
+if('serviceWorker' in navigator&&location.protocol==='https:')navigator.serviceWorker.register('sw.js').catch(()=>{});
+if(location.hash==='#rezept')history.replaceState(null,'',location.pathname);
+render();load();
+</script>
+</body>
+</html>
